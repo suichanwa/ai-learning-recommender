@@ -359,7 +359,19 @@ export default async function ResultPage({
                       >
                         <p className="text-sm font-medium">{resource.title}</p>
                         <p className="line-clamp-2 text-xs text-muted">{resource.snippet}</p>
-                        <p className="mt-1 text-xs text-muted">{resource.domain}</p>
+                        <p className="mt-1 text-xs text-muted">
+                          {resource.domain}
+                          {resource.provider ? ` • ${resource.provider}` : ""}
+                        </p>
+                        {resource.whyPicked && resource.whyPicked.length > 0 ? (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {resource.whyPicked.map((reason) => (
+                              <span key={`${resource.url}-${reason}`} className="rounded-sm border px-1.5 py-0.5 text-[10px] text-muted">
+                                {reason}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
                       </a>
                     ))}
                     {webResources.length === 0 ? <p className="text-sm text-muted">No web resources available.</p> : null}

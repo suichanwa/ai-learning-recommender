@@ -33,6 +33,9 @@ export interface WebResource {
   snippet: string;
   url: string;
   domain: string;
+  provider?: "serper" | "tavily" | "brave" | "curated";
+  whyPicked?: string[];
+  score?: number;
 }
 
 export interface TopicResourceGroup {

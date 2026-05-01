@@ -28,6 +28,8 @@ This project solves that by generating practical learning paths for topics like 
 - Open Library Search API
 - GitHub Search API
 - Serper Web Search API (optional for live docs/site search)
+- Tavily Search API (optional fallback provider)
+- Brave Search API (optional fallback provider)
 
 ## How AI Is Used
 
@@ -39,6 +41,7 @@ Backend pipeline:
 4. book suggestions from Open Library
 5. open-source repositories from GitHub
 6. AI-assisted web docs/site search (Serper + fallback curation)
+   - includes GitHub Pages discovery (`*.github.io`) for practical tutorials
 7. curated internal links
 
 Then OpenAI generates:
@@ -69,6 +72,7 @@ Default model is `gpt-5-nano` (very low cost). You can override with `OPENAI_MOD
   - per-topic tabs
   - Wikipedia summary + link
   - Docs & learning sites from web search
+  - Why-picked explainability tags on web resources
   - YouTube cards (thumbnail, title, channel, link)
   - Open Library book suggestions
   - GitHub repository suggestions
@@ -101,6 +105,8 @@ OPENAI_MODEL="gpt-5-nano"
 YOUTUBE_API_KEY=""
 GITHUB_TOKEN=""
 SERPER_API_KEY=""
+TAVILY_API_KEY=""
+BRAVE_API_KEY=""
 ```
 
 ## Installation & Run
