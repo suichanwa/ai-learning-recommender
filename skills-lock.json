@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "detect-ai": {
+      "source": "humanizerai/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/detect-ai/SKILL.md",
+      "computedHash": "b517846602288124869fde18e7af985b05c6a97c27657a542fdaf6e9d8e2e41a"
+    },
+    "humanize": {
+      "source": "humanizerai/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/humanize/SKILL.md",
+      "computedHash": "0c272016e5734530bf8604533aee2f293444c5d3b3e83eb234b1d65534159160"
+    },
+    "word-stats": {
+      "source": "humanizerai/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/word-stats/SKILL.md",
+      "computedHash": "32aaa46e93f57244dbe9441e1aa6e8eade1c74966282856b547fc89ead1ff33a"
+    }
+  }
+}

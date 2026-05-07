@@ -147,20 +147,18 @@ async function searchSerper(query: string): Promise<WebResource[]> {
     throw new Error(`Serper response ${response.status}`);
   }
   const data = (await response.json()) as SerperResponse;
-  return (
-    data.organic
-      ?.map((entry) => {
-        if (!entry.link || !entry.title) return null;
-        return {
-          title: entry.title,
-          snippet: entry.snippet ?? "Web resource",
-          url: entry.link,
-          domain: parseDomain(entry.link),
-          provider: "serper",
-        } satisfies WebResource;
-      })
-      .filter((entry): entry is WebResource => entry !== null) ?? []
-  );
+  return (data.organic ?? []).flatMap((entry) => {
+    if (!entry.link || !entry.title) return [];
+    return [
+      {
+        title: entry.title,
+        snippet: entry.snippet ?? "Web resource",
+        url: entry.link,
+        domain: parseDomain(entry.link),
+        provider: "serper",
+      } satisfies WebResource,
+    ];
+  });
 }
 
 async function searchTavily(query: string): Promise<WebResource[]> {
@@ -186,20 +184,18 @@ async function searchTavily(query: string): Promise<WebResource[]> {
     throw new Error(`Tavily response ${response.status}`);
   }
   const data = (await response.json()) as TavilyResponse;
-  return (
-    data.results
-      ?.map((entry) => {
-        if (!entry.url || !entry.title) return null;
-        return {
-          title: entry.title,
-          snippet: entry.content ?? "Web resource",
-          url: entry.url,
-          domain: parseDomain(entry.url),
-          provider: "tavily",
-        } satisfies WebResource;
-      })
-      .filter((entry): entry is WebResource => entry !== null) ?? []
-  );
+  return (data.results ?? []).flatMap((entry) => {
+    if (!entry.url || !entry.title) return [];
+    return [
+      {
+        title: entry.title,
+        snippet: entry.content ?? "Web resource",
+        url: entry.url,
+        domain: parseDomain(entry.url),
+        provider: "tavily",
+      } satisfies WebResource,
+    ];
+  });
 }
 
 async function searchBrave(query: string): Promise<WebResource[]> {
@@ -220,20 +216,18 @@ async function searchBrave(query: string): Promise<WebResource[]> {
     throw new Error(`Brave response ${response.status}`);
   }
   const data = (await response.json()) as BraveResponse;
-  return (
-    data.web?.results
-      ?.map((entry) => {
-        if (!entry.url || !entry.title) return null;
-        return {
-          title: entry.title,
-          snippet: entry.description ?? "Web resource",
-          url: entry.url,
-          domain: parseDomain(entry.url),
-          provider: "brave",
-        } satisfies WebResource;
-      })
-      .filter((entry): entry is WebResource => entry !== null) ?? []
-  );
+  return (data.web?.results ?? []).flatMap((entry) => {
+    if (!entry.url || !entry.title) return [];
+    return [
+      {
+        title: entry.title,
+        snippet: entry.description ?? "Web resource",
+        url: entry.url,
+        domain: parseDomain(entry.url),
+        provider: "brave",
+      } satisfies WebResource,
+    ];
+  });
 }
 
 export async function fetchWebResources(
