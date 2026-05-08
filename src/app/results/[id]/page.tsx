@@ -84,8 +84,8 @@ export default async function ResultPage({
             <span className="text-primary">{roadmap.correctedInput || "Not available"}</span>
           </p>
           <div className="flex flex-wrap gap-2">
-            {(roadmap.parsedIntent?.detectedTopics ?? []).map((topic) => (
-              <Badge key={topic} variant="secondary">
+            {(roadmap.parsedIntent?.detectedTopics ?? []).map((topic, index) => (
+              <Badge key={`detected-topic-${index}-${topic}`} variant="secondary">
                 {topic}
               </Badge>
             ))}
@@ -118,8 +118,8 @@ export default async function ResultPage({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted">
-            {roadmap.parsedIntent.ambiguityQuestions.map((question) => (
-              <p key={question}>• {question}</p>
+            {roadmap.parsedIntent.ambiguityQuestions.map((question, index) => (
+              <p key={`ambiguity-${index}-${question}`}>• {question}</p>
             ))}
           </CardContent>
         </Card>
@@ -205,8 +205,8 @@ export default async function ResultPage({
                   <div>
                     <p className="mb-2 text-sm font-semibold">Key Subtopics</p>
                     <div className="flex flex-wrap gap-2">
-                      {topicPlan.keySubtopics.map((subtopic) => (
-                        <Badge key={subtopic} variant="secondary">
+                      {topicPlan.keySubtopics.map((subtopic, index) => (
+                        <Badge key={`subtopic-${index}-${subtopic}`} variant="secondary">
                           {subtopic}
                         </Badge>
                       ))}
@@ -225,8 +225,8 @@ export default async function ResultPage({
                   </CardHeader>
                   <CardContent>
                     <ol className="list-decimal space-y-2 pl-5 text-sm text-muted">
-                      {topicPlan.orderOfStudy.map((step) => (
-                        <li key={step}>{step}</li>
+                      {topicPlan.orderOfStudy.map((step, index) => (
+                        <li key={`step-${index}-${step}`}>{step}</li>
                       ))}
                     </ol>
                   </CardContent>
@@ -261,9 +261,9 @@ export default async function ResultPage({
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {books.map((book) => (
+                    {books.map((book, index) => (
                       <a
-                        key={`${book.url}-${book.title}`}
+                        key={`book-${index}-${book.url}-${book.title}`}
                         href={book.url}
                         target="_blank"
                         rel="noreferrer"
@@ -287,9 +287,9 @@ export default async function ResultPage({
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {repositories.map((repo) => (
+                    {repositories.map((repo, index) => (
                       <a
-                        key={`${repo.url}-${repo.name}`}
+                        key={`repo-${index}-${repo.url}-${repo.name}`}
                         href={repo.url}
                         target="_blank"
                         rel="noreferrer"
@@ -318,9 +318,9 @@ export default async function ResultPage({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {videos.map((video) => (
+                  {videos.map((video, index) => (
                     <a
-                      key={`${video.url}-${video.title}`}
+                      key={`video-${index}-${video.url}-${video.title}`}
                       href={video.url}
                       target="_blank"
                       rel="noreferrer"
@@ -349,9 +349,9 @@ export default async function ResultPage({
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {webResources.map((resource) => (
+                    {webResources.map((resource, resourceIndex) => (
                       <a
-                        key={`${resource.url}-${resource.title}`}
+                        key={`web-${resourceIndex}-${resource.url}-${resource.title}`}
                         href={resource.url}
                         target="_blank"
                         rel="noreferrer"
@@ -365,8 +365,8 @@ export default async function ResultPage({
                         </p>
                         {resource.whyPicked && resource.whyPicked.length > 0 ? (
                           <div className="mt-2 flex flex-wrap gap-1">
-                            {resource.whyPicked.map((reason) => (
-                              <span key={`${resource.url}-${reason}`} className="rounded-sm border px-1.5 py-0.5 text-[10px] text-muted">
+                            {resource.whyPicked.map((reason, reasonIndex) => (
+                              <span key={`why-${resourceIndex}-${reasonIndex}-${reason}`} className="rounded-sm border px-1.5 py-0.5 text-[10px] text-muted">
                                 {reason}
                               </span>
                             ))}
@@ -383,9 +383,9 @@ export default async function ResultPage({
                     <CardTitle>Articles</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
-                    {topicPlan.resources.articles.map((link) => (
+                    {topicPlan.resources.articles.map((link, index) => (
                       <a
-                        key={link}
+                        key={`article-${index}-${link}`}
                         href={link}
                         target="_blank"
                         rel="noreferrer"
@@ -405,8 +405,8 @@ export default async function ResultPage({
                     <CardTitle>Practice / Project Ideas</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm text-muted">
-                    {topicPlan.resources.practice.map((item) => (
-                      <p key={item}>• {item}</p>
+                    {topicPlan.resources.practice.map((item, index) => (
+                      <p key={`practice-${index}-${item}`}>• {item}</p>
                     ))}
                     {topicPlan.resources.practice.length === 0 ? <p>No practice ideas generated.</p> : null}
                   </CardContent>

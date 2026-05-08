@@ -48,6 +48,14 @@ export interface PersonalizationContext {
   goalHistory: string[];
 }
 
+interface TopicResourceBundle {
+  topic: string;
+  rankedVideos: ReturnType<typeof rankVideosWithMetrics>;
+  rankedBooks: ReturnType<typeof rankBooksWithMetrics>;
+  rankedRepos: ReturnType<typeof rankRepositoriesWithMetrics>;
+  rankedWeb: ReturnType<typeof rankWebResourcesWithMetrics>;
+}
+
 const curatedResourceList: Record<string, string[]> = {
   javascript: [
     "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
@@ -141,32 +149,43 @@ export async function buildRecommendation(
   const curatedResources: Record<string, string[]> = {};
   const rankingByTopic: Record<string, number> = {};
 
-  for (let index = 0; index < topics.length; index += 1) {
-    const topic = topics[index];
-    const query = topicSearchQuery(topic, parsedIntent, index);
-    const [videosRaw, booksRaw, reposRaw, webRaw] = await Promise.all([
-      fetchYouTubeVideos(query),
-      fetchOpenLibraryBooks(query),
-      fetchGitHubRepositories(query),
-      fetchWebResources(topic, query),
-    ]);
+  const topicBundles: TopicResourceBundle[] = await Promise.all(
+    topics.map(async (topic, index) => {
+      const query = topicSearchQuery(topic, parsedIntent, index);
+      const [videosRaw, booksRaw, reposRaw, webRaw] = await Promise.all([
+        fetchYouTubeVideos(query),
+        fetchOpenLibraryBooks(query),
+        fetchGitHubRepositories(query),
+        fetchWebResources(topic, query),
+      ]);
 
-    const relevanceText = `${parsedIntent.correctedInput} ${topic}`;
-    const rankedVideos = rankVideosWithMetrics(relevanceText, resolvedDifficulty, videosRaw);
-    const rankedBooks = rankBooksWithMetrics(relevanceText, resolvedDifficulty, booksRaw);
-    const rankedRepos = rankRepositoriesWithMetrics(relevanceText, resolvedDifficulty, reposRaw);
-    const aiRerankedWeb = rerankWebResourcesForIntent(webRaw, parsedIntent, resolvedDifficulty);
-    const rankedWeb = rankWebResourcesWithMetrics(relevanceText, resolvedDifficulty, aiRerankedWeb);
+      const relevanceText = `${parsedIntent.correctedInput} ${topic}`;
+      const rankedVideos = rankVideosWithMetrics(relevanceText, resolvedDifficulty, videosRaw);
+      const rankedBooks = rankBooksWithMetrics(relevanceText, resolvedDifficulty, booksRaw);
+      const rankedRepos = rankRepositoriesWithMetrics(relevanceText, resolvedDifficulty, reposRaw);
+      const aiRerankedWeb = rerankWebResourcesForIntent(webRaw, parsedIntent, resolvedDifficulty);
+      const rankedWeb = rankWebResourcesWithMetrics(relevanceText, resolvedDifficulty, aiRerankedWeb);
 
+      return {
+        topic,
+        rankedVideos,
+        rankedBooks,
+        rankedRepos,
+        rankedWeb,
+      };
+    }),
+  );
+
+  topicBundles.forEach(({ topic, rankedVideos, rankedBooks, rankedRepos, rankedWeb }) => {
     videosByTopic[topic] = rankedVideos.items;
     booksByTopic[topic] = rankedBooks.items;
     reposByTopic[topic] = rankedRepos.items;
     webByTopic[topic] = rankedWeb.items;
-    videoCatalog[topic] = rankedVideos.items.map((video) => video.url);
-    booksCatalog[topic] = rankedBooks.items.map((book) => `${book.title} - ${book.url}`);
-    repoCatalog[topic] = rankedRepos.items.map((repo) => `${repo.name} - ${repo.url}`);
-    webCatalog[topic] = rankedWeb.items.map((resource) => `${resource.title} - ${resource.url}`);
-    curatedResources[topic] = getCuratedResources(topic);
+    videoCatalog[topic] = unique(rankedVideos.items.map((video) => video.url));
+    booksCatalog[topic] = unique(rankedBooks.items.map((book) => `${book.title} - ${book.url}`));
+    repoCatalog[topic] = unique(rankedRepos.items.map((repo) => `${repo.name} - ${repo.url}`));
+    webCatalog[topic] = unique(rankedWeb.items.map((resource) => `${resource.title} - ${resource.url}`));
+    curatedResources[topic] = unique(getCuratedResources(topic));
     rankingByTopic[topic] = Math.round(
       ((rankedVideos.averageScore +
         rankedBooks.averageScore +
@@ -175,7 +194,7 @@ export async function buildRecommendation(
         4) *
         100,
     );
-  }
+  });
 
   const recommendation = await generateAIRecommendation({
     correctedInput: parsedIntent.correctedInput,
@@ -205,9 +224,9 @@ export async function buildRecommendation(
     topicPlans: recommendation.topicPlans.map((topicPlan) => ({
       ...topicPlan,
       resources: {
-        articles: topicPlan.resources.articles.slice(0, 5),
-        videos: topicPlan.resources.videos.slice(0, 4),
-        practice: topicPlan.resources.practice.slice(0, 4),
+        articles: unique(topicPlan.resources.articles).slice(0, 5),
+        videos: unique(topicPlan.resources.videos).slice(0, 4),
+        practice: unique(topicPlan.resources.practice).slice(0, 4),
       },
     })),
     learningGraph: recommendation.learningGraph ?? buildLearningGraph(recommendation.topicPlans),
